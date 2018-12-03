@@ -33,7 +33,7 @@ class HbaseUtil(tableName: String, tmpPath: String) {
   job.setMapOutputKeyClass(classOf[ImmutableBytesWritable])
   job.setMapOutputValueClass(classOf[KeyValue])
 
-  HFileOutputFormat.configureIncrementalLoad(job, table)
+  HFileOutputFormat2.configureIncrementalLoad(job, table)
 
   HbaseUtil.LOGGER.info("HbaseUtil 类已经初始化完毕，即将开始将数据导入Hbase")
 
