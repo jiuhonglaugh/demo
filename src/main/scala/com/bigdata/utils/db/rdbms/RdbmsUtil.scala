@@ -3,7 +3,6 @@ package com.bigdata.utils.db.rdbms
 import java.sql.{Connection, PreparedStatement, SQLException}
 import java.util.Properties
 import org.apache.spark.sql.{DataFrame, Row}
-import org.apache.spark.sql.execution.datasources.jdbc.JdbcUtils
 import org.apache.spark.sql.types._
 import org.slf4j.LoggerFactory
 import scala.util.control.NonFatal
@@ -15,13 +14,13 @@ import scala.util.control.NonFatal
 object RdbmsUtil extends Serializable {
   private val LOGGER = LoggerFactory.getLogger(RdbmsUtil.getClass)
 
-  def savePartition(getConnection: () => Connection,
+  def savePartition(getConnection: Connection,
                     table: String,
                     iterator: Iterator[Row],
                     rddSchema: StructType,
                     mode: SaveMode,
                     batchSize: Int = 1000): Unit = {
-    val conn = getConnection()
+    val conn = getConnection
     var committed = false
     val supportsTransactions = try {
       conn.getMetaData.supportsDataManipulationTransactionsOnly ||
@@ -159,7 +158,7 @@ class RdbmsUtil(mode: SaveMode, authCreateTable: Boolean = false) extends Serial
                 url: String,
                 table: String,
                 props: Properties): Unit = {
-    val conn = JdbcUtils.createConnectionFactory(url, props)()
+    val conn = DbcpUtil.getConnection
     try {
       val tableExists = TableWriteUtil.tableExists(conn, table)
 
@@ -188,7 +187,7 @@ class RdbmsUtil(mode: SaveMode, authCreateTable: Boolean = false) extends Serial
     }
 
     val rddSchema = df.schema
-    val getConnection: () => Connection = JdbcUtils.createConnectionFactory(url, props)
+    val getConnection: Connection = DbcpUtil.getConnection
     df.foreachPartition { iterator =>
       RdbmsUtil.savePartition(getConnection, table, iterator, rddSchema, mode)
     }
