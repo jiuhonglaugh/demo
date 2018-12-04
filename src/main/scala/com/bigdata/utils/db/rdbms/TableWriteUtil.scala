@@ -1,6 +1,6 @@
 package com.bigdata.utils.db.rdbms
 
-import java.sql.{Connection, SQLException}
+import java.sql.{Connection, PreparedStatement, SQLException}
 
 import org.apache.spark.sql.types.StructType
 
@@ -95,6 +95,34 @@ object TableWriteUtil {
         statement.close()
       }
     }.isSuccess
+  }
+
+  /**
+    * INSERT INTO 语句
+    * @param conn        数据库连接
+    * @param table       表名
+    * @param rddSchema   字段信息
+    * @return
+    */
+  def insertStatement(conn: Connection, table: String, rddSchema: StructType): PreparedStatement = {
+    val columns = rddSchema.fields.map(_.name).mkString(",")
+    val placeholders = rddSchema.fields.map(_ => "?").mkString(",")
+    val sql = s"INSERT INTO $table ($columns) VALUES ($placeholders)"
+    conn.prepareStatement(sql)
+  }
+
+  /**
+    * REPLACE INTO 语句
+    * @param  conn        数据库连接
+    * @param  table       表名
+    * @param  rddSchema   字段信息
+    * @return
+    */
+  def replaceStatement(conn: Connection, table: String, rddSchema: StructType): PreparedStatement = {
+    val columns = rddSchema.fields.map(_.name).mkString(",")
+    val placeholders = rddSchema.fields.map(_ => "?").mkString(",")
+    val sql = s"REPLACE INTO $table ($columns) VALUES ($placeholders)"
+    conn.prepareStatement(sql)
   }
 
 }
