@@ -27,13 +27,27 @@ object DbcpUtil {
     case e: Exception => LOGGER.error(e.toString)
   }
 
-  def getConnection: Connection = {
+  /**
+    * 获取连接
+    *
+    * @return
+    */
+  def getConnection: () => Connection = {
     var connection: Connection = null
     try {
       connection = dataSource.getConnection()
     } catch {
       case e: SQLException => LOGGER.error(e.toString)
     }
-    connection
+    connection()
+  }
+
+  /**
+    * 返回 properties 对象
+    *
+    * @return
+    */
+  def getProp: Properties = {
+    properties
   }
 }
