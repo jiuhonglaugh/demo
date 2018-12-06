@@ -2,7 +2,8 @@ package com.bigdata.utils.db.rdbms
 
 import java.sql.{Connection, PreparedStatement, SQLException}
 
-import org.apache.spark.sql.types.StructType
+import org.apache.spark.sql.types._
+import org.slf4j.{Logger, LoggerFactory}
 
 import scala.util.Try
 
@@ -11,6 +12,9 @@ import scala.util.Try
   * @version 10=.0
   **/
 object TableWriteUtil {
+
+  private val LOGGER: Logger = LoggerFactory.getLogger(TableWriteUtil.getClass)
+
   /**
     * 创建表
     *
